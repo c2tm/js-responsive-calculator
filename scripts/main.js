@@ -13,9 +13,13 @@ const percent = document.getElementsByClassName("percent");
 const equals = document.querySelector(".equal-sign");
 const screen = document.querySelector(".calculator-screen");
 const decimal = document.querySelector(".decimal");
+const squared = document.querySelector(".squared");
+const cubed = document.querySelector(".cubed");
 
 let tempCalc = [];
 let calculation = [];
+let numOnly1 = [];
+let numOnly2 = [];
 let result = '';
 let roundedResult = ``;
 let allPoss = [`1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `0`, `.`];
@@ -27,6 +31,7 @@ let currentOp = undefined;
 let displayNumber = 0;
 let pmAmount = 0;
 let opAmount = 0;
+let eqAmt = 0;
 
 
 // Functions
@@ -37,7 +42,18 @@ function pushNumber() {
         numberButtons[i].addEventListener("click", function(){
             // alert(numberButtons[i].textContent);
             calculation.push(numberButtons[i].value);
-            if(displayNumber === `-0`   ) {
+            
+            if (currentOPPreCalc == undefined) {
+                numOnly1.push(numberButtons[i].value);
+            } else {
+                numOnly2.push(numberButtons[i].value);
+            }
+            
+
+            if (eqAmt > 0) {
+                displayNumber = numberButtons[i].value;
+                eqAmt = 0;
+            } else if(displayNumber === `-0`) {
                 displayNumber = `-` + numberButtons[i].value - 0;
             } else if(displayNumber === 0) {
                 displayNumber = numberButtons[i].value - 0;
@@ -159,23 +175,88 @@ function pushNP() {
     }
 }pushNP();
 
-function decimalButton() {
+function pushDecimalButton() {
     decimal.addEventListener("click", function(){
         calculation.push(decimal.value);
         displayNumber += `.`;
         screen.value = `${displayNumber}`;
     })
     
-}decimalButton();
+}pushDecimalButton();
 
-function multiCalc() {
-   
-}multiCalc();
+function pushSquared() {
+    squared.addEventListener("click", function() {
+        if(currentOPPreCalc == undefined) {
+            currentNum1 = Number(numOnly1.join(""))
+            currentNum1 *= currentNum1;
+            tempCalc.push(currentNum1);
+            calculation = [];
+            tempCalc = tempCalc.toString();
+                    for(let i = 0; i < tempCalc.length; i++) {
+                        calculation.push(tempCalc[i]);
+                    }
+            displayNumber = `${currentNum1}`;
+            screen.value = `${currentNum1}`;
+
+        }else if(currentOPPreCalc != undefined) {
+            currentNum2 = Number(numOnly2.join(""))
+            currentNum2 *= currentNum2;
+            tempCalc.push(currentNum2);
+            calculation = [];
+            tempCalc = tempCalc.toString();
+                    for(let i = 0; i < tempCalc.length; i++) {
+                        calculation.push(tempCalc[i]);
+                    }
+            displayNumber = `${currentNum2}`;
+            screen.value = `${currentNum2}`;
+        }
+    currentNum1 = 0;
+    currentNum2 = 0;    
+    numOnly1 = [];
+    numOnly2 = [];
+    tempCalc = [];
+    });
+}pushSquared();
+
+function pushCubed() {
+    cubed.addEventListener("click", function() {
+        console.log(calculation);
+        if(currentOPPreCalc == undefined) {
+            currentNum1 = Number(numOnly1.join(""))
+            currentNum1 = currentNum1 * currentNum1 * currentNum1;
+            tempCalc.push(currentNum1);
+            calculation = [];
+            tempCalc = tempCalc.toString();
+                    for(let i = 0; i < tempCalc.length; i++) {
+                        calculation.push(tempCalc[i]);
+                    }
+            displayNumber = `${currentNum1}`;
+            screen.value = `${currentNum1}`;
+
+        }else if(currentOPPreCalc != undefined) {
+            currentNum2 = Number(numOnly2.join(""))
+            currentNum2 = currentNum2 * currentNum2 * currentNum2;
+            tempCalc.push(currentNum2);
+            calculation = [];
+            tempCalc = tempCalc.toString();
+                    for(let i = 0; i < tempCalc.length; i++) {
+                        calculation.push(tempCalc[i]);
+                    }
+            displayNumber = `${currentNum2}`;
+            screen.value = `${currentNum2}`;
+        }
+    currentNum1 = 0;
+    currentNum2 = 0;
+    numOnly1 = [];
+    numOnly2 = [];
+    tempCalc = [];
+    });
+}pushCubed();
 
 function calculate() {
    
     equals.addEventListener("click", function(){
-
+        eqAmt += 1;
         for(let i = 0; i < calculation.length; i++) {
         
                 if(currentOp == undefined && allPoss.includes(calculation[i])) {
@@ -202,24 +283,30 @@ function calculate() {
                 }
 
        
-        if(result.length > 8) {
-            roundedResult = result.toExponential();
-            screen.value = `${roundedResult}`;
-        }else {
-            screen.value = `${result}`;
-        }
+        // if(calculation.length > 8) {
+        //     roundedResult = result.toExponential();
+        //     screen.value = `${roundedResult}`;
+        // }else {
+        //     screen.value = `${result}`;
+        // }
        
         // alert(`The answer is ${result}!`);
-        
+        screen.value = `${result}`;
+        tempCalc = [];
+        calculation = [];
+        numOnly1 = [];
+        numOnly2 = [];
+        result = '';
+        roundedResult = ``;
         currentNum1 = 0;
         currentNum2 = 0;
-        currentOp = undefined;
         currentOPPreCalc = undefined;
-        calculation = []; 
+        currentOp = undefined;
         displayNumber = 0;
         pmAmount = 0;
         opAmount = 0;
-        result = ``;
+        eqAmt = 0;
+        
 
     })
 }calculate();

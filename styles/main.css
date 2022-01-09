@@ -54,6 +54,7 @@ button:focus {
 .calculator-keys {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
+  background-color: #5D5A58;
 }
 
 .btn-lg {
