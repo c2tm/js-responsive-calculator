@@ -12,9 +12,13 @@ const clearButton = document.getElementsByClassName("clear");
 const percent = document.getElementsByClassName("percent");
 const equals = document.querySelector(".equal-sign");
 const screen = document.querySelector(".calculator-screen");
+const decimal = document.querySelector(".decimal");
+
+let tempCalc = [];
 let calculation = [];
 let result = '';
-let allPoss = [`1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `0`];
+let roundedResult = ``;
+let allPoss = [`1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `9`, `0`, `.`];
 let allOpPoss = [`-` , `/` , `*`, `+`];
 let currentNum1 = 0;
 let currentNum2 = 0;
@@ -22,6 +26,7 @@ let currentOPPreCalc = undefined;
 let currentOp = undefined;
 let displayNumber = 0;
 let pmAmount = 0;
+let opAmount = 0;
 
 
 // Functions
@@ -32,14 +37,20 @@ function pushNumber() {
         numberButtons[i].addEventListener("click", function(){
             // alert(numberButtons[i].textContent);
             calculation.push(numberButtons[i].value);
-            if(displayNumber === `-0`) {
+            if(displayNumber === `-0`   ) {
                 displayNumber = `-` + numberButtons[i].value - 0;
             } else if(displayNumber === 0) {
                 displayNumber = numberButtons[i].value - 0;
             } else {
                 displayNumber += `${numberButtons[i].value - 0}`;
             }
+
+            if(displayNumber.length >= 9) {
+                displayNumber = displayNumber.slice(1);
+            }
             screen.value = `${displayNumber}`;
+            console.log(calculation);
+
         })
     }
 }pushNumber();
@@ -48,6 +59,48 @@ function pushNumber() {
 function pushOperator() {
     for(let i = 0; i < opButtons.length; i++) {
         opButtons[i].addEventListener("click", function(){
+            opAmount += 1;
+            if(opAmount > 1) {
+                let tempResult = 0;
+                for(let i = 0; i < calculation.length; i++) {
+        
+                    if(currentOp == undefined && allPoss.includes(calculation[i])) {
+                        currentNum1 += calculation[i];
+                    } else if(currentOp == undefined && allOpPoss.includes(calculation[i])) {
+                        currentOp = calculation[i];
+                    } else {                                                             
+                        currentNum2 += calculation[i];           
+                    }
+                                                                                        //multiple number + operator combos                         
+                   }
+                    if(currentOp === `+`) {
+                        // alert('Addition!');
+                        tempResult = Number(currentNum1) + Number(currentNum2);
+                    } else if (currentOp === `-`) {
+                        // alert('Subtraction!');
+                        tempResult = Number(currentNum1) - Number(currentNum2);
+                    } else if (currentOp === `/`) {
+                        // alert('Division!')
+                        tempResult = Number(currentNum1) / Number(currentNum2);
+                    } else {
+                        // alert('Multiplication!')
+                        tempResult = Number(currentNum1) * Number(currentNum2);
+                    }
+                calculation = [];
+                tempCalc.push(tempResult);
+                tempCalc = tempCalc.toString();
+                    for(let i = 0; i < tempCalc.length; i++) {
+                        calculation.push(tempCalc[i]);
+                    }
+                currentNum1 = 0;
+                currentNum2 = 0;
+                currentOp = undefined;
+                currentOPPreCalc = undefined;
+                displayNumber = 0;
+                pmAmount = 0;
+                opAmount = 1;
+                tempCalc = [];
+            }
             // alert(opButtons[i].textContent);
             calculation.push(opButtons[i].value);
             screen.value = `${opButtons[i].value}`;
@@ -59,18 +112,24 @@ function pushOperator() {
         clearButton[i].addEventListener("click", function(){
             // alert(clearButton[i].textContent);
             calculation = [];
+            currentNumber1 = 0;
+            currentNumber2 = 0;
             result = 0;
             displayNumber = 0;
             pmAmount = 0;
             screen.value = `0`;
+            opAmount = 0;
         })
     }
 }pushOperator();
 
 
 function pushNP() {
+    
     for(let i = 0; i < plusMinus.length; i++) {
+
         plusMinus[i].addEventListener("click", function(){
+
             if(pmAmount % 2 == 0) {
                 if (currentOPPreCalc == undefined) {
                     currentNum1 = `-` + currentNum1;
@@ -81,6 +140,7 @@ function pushNP() {
                     displayNumber = `-` + displayNumber;
                     screen.value = `${displayNumber}`;
                 }
+
             } else if(pmAmount % 2 != 0) {
                 if (currentOPPreCalc == undefined) {
                     currentNum1 = currentNum1.slice(1);
@@ -92,16 +152,30 @@ function pushNP() {
                     screen.value = `${displayNumber}`;
                 }
             }
+
             pmAmount += 1;
+       
         })
     }
 }pushNP();
 
+function decimalButton() {
+    decimal.addEventListener("click", function(){
+        calculation.push(decimal.value);
+        displayNumber += `.`;
+        screen.value = `${displayNumber}`;
+    })
+    
+}decimalButton();
+
+function multiCalc() {
+   
+}multiCalc();
 
 function calculate() {
    
     equals.addEventListener("click", function(){
-        
+
         for(let i = 0; i < calculation.length; i++) {
         
                 if(currentOp == undefined && allPoss.includes(calculation[i])) {
@@ -127,18 +201,30 @@ function calculate() {
                     result = Number(currentNum1) * Number(currentNum2);
                 }
 
+       
+        if(result.length > 8) {
+            roundedResult = result.toExponential();
+            screen.value = `${roundedResult}`;
+        }else {
+            screen.value = `${result}`;
+        }
+       
         // alert(`The answer is ${result}!`);
-        screen.value = `${result}`;
+        
         currentNum1 = 0;
         currentNum2 = 0;
         currentOp = undefined;
         currentOPPreCalc = undefined;
-        result = 0;
         calculation = []; 
         displayNumber = 0;
         pmAmount = 0;
+        opAmount = 0;
+        result = ``;
+
     })
 }calculate();
+
+
 
 
 
